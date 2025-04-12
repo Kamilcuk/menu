@@ -107,4 +107,30 @@ M.open = function(items, opts)
   end
 end
 
+---@class DefaultCallbackArgs
+---@field mouse boolean If the callback will be called from mouse or keyboard
+
+---@param opts DefaultCallbackArgs
+M.default_callback = function(opts)
+  return function()
+    opts = opts or {}
+    if opts.mouse then
+      -- on second mouse click remove current manu and reopn it
+      require("menu.utils").delete_old_menus()
+      vim.cmd.exec '"normal! \\<RightMouse>"'
+    else
+      if #require("menu.state").bufids > 0 then
+        -- if a menu is already open, close it
+        require("menu.utils").delete_old_menus()
+        return
+      end
+    end
+    local buf = vim.api.nvim_win_get_buf(vim.fn.getmousepos().winid)
+    local ft = vim.bo[buf].ft
+    local options = ft == "NvimTree" and "nvimtree" or ft == "neo-tree" and "neo-tree" or "default"
+    require("menu").open(options, { mouse = opts.mouse })
+  end
+end
+
+
 return M
