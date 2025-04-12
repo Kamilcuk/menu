@@ -28,25 +28,13 @@ require("menu").open(options, opts)
 
 ### Examples
 
-- Keyboard users can run the mapping when inside the menu, mouse users can click.
+Keyboard users can run the mapping when inside the menu, mouse users can click.
+
 ```lua
--- Keyboard users
-vim.keymap.set("n", "<C-t>", function()
-  require("menu").open("default")
-end, {})
-
--- mouse users + nvimtree users!
-vim.keymap.set({ "n", "v" }, "<RightMouse>", function()
-  require('menu.utils').delete_old_menus()
-
-  vim.cmd.exec '"normal! \\<RightMouse>"'
-
-  -- clicked buf
-  local buf = vim.api.nvim_win_get_buf(vim.fn.getmousepos().winid)
-  local options = vim.bo[buf].ft == "NvimTree" and "nvimtree" or "default"
-
-  require("menu").open(options, { mouse = true })
-end, {})
+-- Keyboard users. The menu will be closed on second keymap trigger.
+vim.keymap.set("n", "<C-t>", require("menu").default_callback {mouse = false}, {})
+-- Mouse users. The menu will be re-opened at a new location when second right mouse click is done.
+vim.keymap.set({ "n", "v" }, "<RightMouse>", require("menu").default_callback {mouse = true}, {})
 ```
 
 Check example of [defaults menu](https://github.com/NvChad/menu/blob/main/lua/menus/default.lua) to see know syntax of options table.
